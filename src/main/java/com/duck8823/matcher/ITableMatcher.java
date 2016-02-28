@@ -21,39 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.duck8823.matcher;
 
-package com.duck8823.dao;
+import org.dbunit.Assertion;
+import org.dbunit.DatabaseUnitException;
+import org.dbunit.DatabaseUnitRuntimeException;
+import org.dbunit.dataset.ITable;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
-import com.duck8823.model.Person;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Optional;
 
 /**
- * {@link com.duck8823.model.Person}にアクセスするためのDAOクラス
+ * {@link ITable}を検証するMatcher
  * Created by maeda on 2016/02/28.
  */
-@Component
-public class PersonDao {
+public class ITableMatcher extends TypeSafeMatcher<ITable> {
 
-	@Autowired
-	private DataSource dataSource;
-
-	public List<Person> list() throws SQLException {
-		ResultSet rs = dataSource.getConnection().createStatement().executeQuery("SELECT id, name FROM person");
-		LinkedList<Person> result = new LinkedList<>();
-		while(rs.next()){
-			result.add(new Person(rs.getLong("id"), rs.getString("name")));
-		}
-		return result;
+	public static Matcher<ITable> tableOf(ITable expected){
+		return new ITableMatcher(expected);
 	}
 
-	public void add(Person person) throws SQLException {
-		dataSource.getConnection().createStatement().execute("INSERT INTO person (id, name) VALUES (" + person.getId() + ", '" + person.getName() + "')");
+	private final ITable expected;
+	Optional<String> message = Optional.empty();
+
+	ITableMatcher(ITable expected) {
+		this.expected = expected;
+	}
+
+	@Override
+	protected boolean matchesSafely(ITable actual) {
+		try {
+			Assertion.assertEquals(expected, actual);
+		} catch (DatabaseUnitException e) {
+			throw new DatabaseUnitRuntimeException(e);
+		} catch (AssertionError e){
+			message = Optional.ofNullable(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void describeTo(Description description) {
+		description.appendValue(expected);
+		message.ifPresent(description::appendText);
 	}
 }
