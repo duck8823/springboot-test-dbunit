@@ -48,7 +48,7 @@ public void test() {
 #### IDataSetMatcher
 パスを指定
 ```java
-import static com.duck8823.IDataSetMatcher.dataSetOf;
+import static com.duck8823.mathcer.IDataSetMatcher.dataSetOf;
 import static org.junit.Assert.assertThat;
 ...
 @Test
@@ -60,7 +60,7 @@ public void test() {
   
 IDataSetを指定
 ```java
-import static com.duck8823.IDataSetMatcher.dataSetOf;
+import static com.duck8823.mathcer.IDataSetMatcher.dataSetOf;
 import static org.junit.Assert.assertThat;
 ...
 @Test
@@ -74,7 +74,7 @@ public void test() {
 #### ITableMatcher
 ITableを指定
 ```java
-import static com.duck8823.ITableMatcher.tableOf;
+import static com.duck8823.mathcer.ITableMatcher.tableOf;
 import static org.junit.Assert.assertThat;
 ...
 @Test
