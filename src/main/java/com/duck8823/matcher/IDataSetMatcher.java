@@ -60,6 +60,7 @@ public class IDataSetMatcher extends TypeSafeMatcher<IDataSet> {
 		this.expected = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(expected));
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	protected boolean matchesSafely(IDataSet actual) {
 		try {

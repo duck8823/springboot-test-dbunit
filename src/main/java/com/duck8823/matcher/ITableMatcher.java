@@ -50,6 +50,7 @@ public class ITableMatcher extends TypeSafeMatcher<ITable> {
 		this.expected = expected;
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	protected boolean matchesSafely(ITable actual) {
 		try {
