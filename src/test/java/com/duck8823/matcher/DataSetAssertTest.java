@@ -1,26 +1,3 @@
-/**
- * The MIT License (MIT)
- *
- * Copyright (c) 2016 Shunsuke Maeda
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package com.duck8823.matcher;
 
 import com.duck8823.DbUnitTestListener;
@@ -31,6 +8,7 @@ import com.duck8823.model.Person;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,14 +24,13 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.duck8823.matcher.IDataSetMatcher.dataSetOf;
+import static com.duck8823.matcher.DataSetAssertions.assertThat;
 import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * {@link IDataSetMatcher}のテスト
- * Created by maeda on 2016/02/28.
+ * {@link DataSetAssert}のテスト
+ * Created by maeda on 7/14/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
@@ -63,7 +40,7 @@ import static org.junit.Assert.fail;
 		DbUnitTestListener.class
 })
 @Transactional
-public class IDataSetMatcherTest {
+public class DataSetAssertTest {
 
 	@Autowired
 	private PersonDao personDao;
@@ -73,23 +50,35 @@ public class IDataSetMatcherTest {
 
 	@DataSet("/META-INF/dbtest/data.xml")
 	@Test
-	public void 正しい予測データセットを指定したときに成功する() throws SQLException, DatabaseUnitException {
+	public void IDataSetで正しい予測データセットを指定したときに成功する() throws Exception {
 		List<Person> list = personDao.list();
-		assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
+		Assert.assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
 
 		Person person = new Person(6L, "hoge");
 		personDao.add(person);
 
 		IDataSet actual = new DatabaseConnection(dataSource.getConnection()).createDataSet();
 
-		assertThat(actual, dataSetOf("/META-INF/dbtest/expected.xml"));
+		assertThat(actual).dataSetOf("/META-INF/dbtest/expected.xml");
 	}
 
 	@DataSet("/META-INF/dbtest/data.xml")
 	@Test
-	public void 異なる予測データセットを指定したときに失敗する() throws SQLException, DatabaseUnitException {
+	public void dataSourceで正しい予測データセットを指定したときに成功する() throws Exception {
 		List<Person> list = personDao.list();
-		assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
+		Assert.assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
+
+		Person person = new Person(6L, "hoge");
+		personDao.add(person);
+
+		assertThat(dataSource).dataSetOf("/META-INF/dbtest/expected.xml");
+	}
+
+	@DataSet("/META-INF/dbtest/data.xml")
+	@Test
+	public void IDataSetで異なる予測データセットを指定したときに失敗する() throws SQLException, DatabaseUnitException {
+		List<Person> list = personDao.list();
+		Assert.assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
 
 		Person person = new Person(6L, "hoge");
 		personDao.add(person);
@@ -97,7 +86,26 @@ public class IDataSetMatcherTest {
 		IDataSet actual = new DatabaseConnection(dataSource.getConnection()).createDataSet();
 
 		try {
-			assertThat(actual, dataSetOf("/META-INF/dbtest/failed_expected.xml"));
+			assertThat(actual).dataSetOf("/META-INF/dbtest/failed_expected.xml");
+			throw new Exception();
+		} catch (AssertionError e){
+			//ok
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@DataSet("/META-INF/dbtest/data.xml")
+	@Test
+	public void dataSourceで異なる予測データセットを指定したときに失敗する() throws SQLException, DatabaseUnitException {
+		List<Person> list = personDao.list();
+		Assert.assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
+
+		Person person = new Person(6L, "hoge");
+		personDao.add(person);
+
+		try {
+			assertThat(dataSource).dataSetOf("/META-INF/dbtest/failed_expected.xml");
 			throw new Exception();
 		} catch (AssertionError e){
 			//ok

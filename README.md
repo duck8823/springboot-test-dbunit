@@ -45,6 +45,17 @@ public void test() {
   
 ### マッチャーの利用
 データベースの値とxmlファイルで指定したデータを比較検証できます.
+#### AssertJスタイル
+パスを指定
+```java
+import static com.duck8823.matcher.DataSetAssertions.assertThat;
+...
+@Test
+public void test() {
+    assertThat(dataSource).dataSetOf("expected.xml");
+}
+```
+
 #### IDataSetMatcher
 パスを指定
 ```java
