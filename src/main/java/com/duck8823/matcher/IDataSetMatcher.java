@@ -32,6 +32,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -50,13 +51,13 @@ public class IDataSetMatcher extends TypeSafeMatcher<IDataSet> {
 	}
 
 	private final IDataSet expected;
-	Optional<String> message = Optional.empty();
+	private String message;
 
-	IDataSetMatcher(IDataSet expected) {
+	protected IDataSetMatcher(IDataSet expected) {
 		this.expected = expected;
 	}
 
-	IDataSetMatcher(String expected) throws DataSetException {
+	protected IDataSetMatcher(String expected) throws DataSetException {
 		this.expected = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(expected));
 	}
 
@@ -68,7 +69,7 @@ public class IDataSetMatcher extends TypeSafeMatcher<IDataSet> {
 		} catch (DatabaseUnitException e) {
 			throw new DatabaseUnitRuntimeException(e);
 		} catch (AssertionError e){
-			message = Optional.ofNullable(e.getMessage());
+			message = e.getMessage();
 			return false;
 		}
 		return true;
@@ -77,6 +78,8 @@ public class IDataSetMatcher extends TypeSafeMatcher<IDataSet> {
 	@Override
 	public void describeTo(Description description) {
 		description.appendValue(expected);
-		message.ifPresent(description::appendText);
+		if (!StringUtils.isEmpty(message)) {
+			description.appendText(message);
+		}
 	}
 }

@@ -34,7 +34,6 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Optional;
 
 /**
  * {@link DataSet}をテストデータとして利用するリスナークラス
@@ -44,25 +43,19 @@ public class DbUnitTestListener extends AbstractTestExecutionListener {
 
 	@Override
 	public void beforeTestClass(TestContext testContext) throws Exception {
-		Optional<DataSet> dataSet = Optional.ofNullable(testContext.getTestClass().getAnnotation(DataSet.class));
-		before(testContext, dataSet);
+		before(testContext, testContext.getTestClass().getAnnotation(DataSet.class));
 	}
 
 	@Override
 	public void beforeTestMethod(TestContext testContext) throws Exception {
-		Optional<DataSet> dataSet = Optional.ofNullable(testContext.getTestMethod().getDeclaredAnnotation(DataSet.class));
-		before(testContext, dataSet);
+		before(testContext, testContext.getTestMethod().getDeclaredAnnotation(DataSet.class));
 	}
 
-	private void before(TestContext testContext, Optional<DataSet> dataSetOpt) {
-		dataSetOpt.ifPresent(dataSet -> {
-			try {
-				DatabaseConnection connection = new DatabaseConnection(testContext.getApplicationContext().getBean(DataSource.class).getConnection());
-				IDataSet iDataSet = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(dataSet.value()));
-				DatabaseOperation.CLEAN_INSERT.execute(connection, iDataSet);
-			} catch (SQLException | DatabaseUnitException e) {
-				throw new IllegalStateException(e);
-			}
-		});
+	private void before(TestContext testContext, DataSet dataSet) throws DatabaseUnitException, SQLException {
+		if(dataSet != null){
+			DatabaseConnection connection = new DatabaseConnection(testContext.getApplicationContext().getBean(DataSource.class).getConnection());
+			IDataSet iDataSet = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(dataSet.value()));
+			DatabaseOperation.CLEAN_INSERT.execute(connection, iDataSet);
+		}
 	}
 }

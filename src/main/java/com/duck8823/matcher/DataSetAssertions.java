@@ -40,11 +40,7 @@ public class DataSetAssertions {
 		return new DataSetAssert(actual);
 	}
 
-	public static DataSetAssert assertThat(DataSource dataSource) {
-		try {
-			return new DataSetAssert(new DatabaseConnection(dataSource.getConnection()).createDataSet());
-		} catch (SQLException | DatabaseUnitException e) {
-			throw new IllegalStateException(e);
-		}
+	public static DataSetAssert assertThat(DataSource dataSource) throws SQLException, DatabaseUnitException {
+		return new DataSetAssert(new DatabaseConnection(dataSource.getConnection()).createDataSet());
 	}
 }

@@ -6,6 +6,23 @@ springbootでDbUnitのデータセットを使う.
   
 
 ## 基本的な使い方
+### Maven
+pom.xml
+```xml
+<repository>
+	<id>duck8823.com</id>
+	<name>duck8823.com</name>
+	<url>http://www.duck8823.com/maven</url>
+</repository>
+...
+<dependency>
+	<groupId>com.duck8823.springboot</groupId>
+	<artifactId>springboot-test-dbunit</artifactId>
+	<version>0.0.3</version>
+	<scope>test</scope>
+</dependency>
+```
+
 ### テストデータの用意  
 data.xml
 ```xml

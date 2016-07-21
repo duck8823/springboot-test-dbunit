@@ -5,9 +5,12 @@ import com.duck8823.TestApplication;
 import com.duck8823.annotation.DataSet;
 import com.duck8823.dao.PersonDao;
 import com.duck8823.model.Person;
+import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +28,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static com.duck8823.matcher.DataSetAssertions.assertThat;
+import static com.duck8823.matcher.IDataSetMatcher.dataSetOf;
 import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
 import static org.junit.Assert.fail;
 
@@ -58,8 +62,9 @@ public class DataSetAssertTest {
 		personDao.add(person);
 
 		IDataSet actual = new DatabaseConnection(dataSource.getConnection()).createDataSet();
+		IDataSet expect = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream("/META-INF/dbtest/expected.xml"));
 
-		assertThat(actual).dataSetOf("/META-INF/dbtest/expected.xml");
+		Assert.assertThat(actual, dataSetOf(expect));
 	}
 
 	@DataSet("/META-INF/dbtest/data.xml")
@@ -84,7 +89,6 @@ public class DataSetAssertTest {
 		personDao.add(person);
 
 		IDataSet actual = new DatabaseConnection(dataSource.getConnection()).createDataSet();
-
 		try {
 			assertThat(actual).dataSetOf("/META-INF/dbtest/failed_expected.xml");
 			throw new Exception();

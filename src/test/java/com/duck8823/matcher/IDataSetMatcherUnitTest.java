@@ -23,30 +23,40 @@
  */
 package com.duck8823.matcher;
 
-import org.assertj.core.api.AbstractAssert;
-import org.dbunit.dataset.DataSetException;
+import org.dbunit.Assertion;
+import org.dbunit.DatabaseUnitException;
+import org.dbunit.DatabaseUnitRuntimeException;
+import org.dbunit.assertion.FailureHandler;
 import org.dbunit.dataset.IDataSet;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
- * データセットと比較する.
- * Created by maeda on 7/13/2016.
+ * {@link IDataSetMatcher}のテスト
+ * Created by maeda on 2016/07/21.
  */
-public class DataSetAssert extends AbstractAssert<DataSetAssert, IDataSet> {
+@PrepareForTest({Assertion.class})
+@RunWith(PowerMockRunner.class)
+public class IDataSetMatcherUnitTest {
 
-	DataSetAssert(IDataSet actual) {
-		super(actual, DataSetAssert.class);
-	}
-
-	/**
-	 * リソースの内容と一致しているか検証する
-	 * @param name リソース
-	 * @return DataSetAssert
-	 */
-	public DataSetAssert dataSetOf(String name) throws DataSetException {
-		if (!IDataSetMatcher.dataSetOf(name).matches(this.actual)){
-			this.failWithMessage("内容が一致しません.\n(実際の値=\"%s\")\n（期待値=\"%s\"）", this.actual, IDataSetMatcher.dataSetOf(name));
+	@Test
+	public void Assertion_assertEqualsでDatabaseUnitExceptionが発生した場合にDatabaseUnitRuntimeExceptionをthrowする() throws Exception {
+		IDataSet dataSet = mock(IDataSet.class);
+		mockStatic(Assertion.class);
+		//noinspection unchecked
+		when(Assertion.class, "assertEquals", dataSet, dataSet).thenThrow(DatabaseUnitException.class);
+		IDataSetMatcher matcher = new IDataSetMatcher(dataSet);
+		try {
+			matcher.matchesSafely(dataSet);
+			fail();
+		} catch (DatabaseUnitRuntimeException ignore){
 		}
-		return this;
 	}
-
 }

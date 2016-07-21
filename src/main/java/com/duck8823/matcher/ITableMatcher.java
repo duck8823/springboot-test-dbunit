@@ -30,6 +30,7 @@ import org.dbunit.dataset.ITable;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -44,9 +45,9 @@ public class ITableMatcher extends TypeSafeMatcher<ITable> {
 	}
 
 	private final ITable expected;
-	Optional<String> message = Optional.empty();
+	private String message;
 
-	ITableMatcher(ITable expected) {
+	protected ITableMatcher(ITable expected) {
 		this.expected = expected;
 	}
 
@@ -58,7 +59,7 @@ public class ITableMatcher extends TypeSafeMatcher<ITable> {
 		} catch (DatabaseUnitException e) {
 			throw new DatabaseUnitRuntimeException(e);
 		} catch (AssertionError e){
-			message = Optional.ofNullable(e.getMessage());
+			message = e.getMessage();
 			return false;
 		}
 		return true;
@@ -67,6 +68,8 @@ public class ITableMatcher extends TypeSafeMatcher<ITable> {
 	@Override
 	public void describeTo(Description description) {
 		description.appendValue(expected);
-		message.ifPresent(description::appendText);
+		if(!StringUtils.isEmpty(message)){
+			description.appendText(message);
+		}
 	}
 }
