@@ -25,12 +25,8 @@ package com.duck8823.matcher;
 
 import net.arnx.jsonic.JSON;
 import org.assertj.core.api.AbstractAssert;
-import org.dbunit.dataset.Column;
-import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.*;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.springframework.boot.json.JsonParser;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +51,24 @@ public class DataSetAssert extends AbstractAssert<DataSetAssert, IDataSet> {
 			this.failWithMessage("内容が一致しません.\n(実際の値=\"%s\")\n（期待値=\"%s\"）",
 					toJsonString(this.actual),
 					toJsonString(new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(name)))
+			);
+		}
+		return this;
+	}
+
+	/**
+	 * リソースの内容と一致しているか検証する
+	 * @param name リソース
+	 * @param replacement 置き換えるキー：値ペアのMap
+	 * @return DataSetAssert
+	 */
+	public DataSetAssert dataSetOf(String name, Map<String, Object> replacement) throws DataSetException {
+		ReplacementDataSet dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(name)));
+		replacement.keySet().forEach(key -> dataSet.addReplacementObject(key, replacement.get(key)));
+		if (!new IDataSetMatcher(dataSet).matches(this.actual)){
+			this.failWithMessage("内容が一致しません.\n(実際の値=\"%s\")\n（期待値=\"%s\"）",
+					toJsonString(this.actual),
+					toJsonString(dataSet)
 			);
 		}
 		return this;

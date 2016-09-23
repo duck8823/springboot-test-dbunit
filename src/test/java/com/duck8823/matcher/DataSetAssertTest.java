@@ -5,6 +5,7 @@ import com.duck8823.TestApplication;
 import com.duck8823.annotation.DataSet;
 import com.duck8823.dao.PersonDao;
 import com.duck8823.model.Person;
+import org.apache.commons.collections.map.SingletonMap;
 import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConnection;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import static com.duck8823.matcher.DataSetAssertions.assertThat;
@@ -110,6 +112,37 @@ public class DataSetAssertTest {
 
 		try {
 			assertThat(dataSource).dataSetOf("/META-INF/dbtest/failed_expected.xml");
+			throw new Exception();
+		} catch (AssertionError e){
+			//ok
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@DataSet("/META-INF/dbtest/data.xml")
+	@Test
+	public void dataSourceで正しい予測データセットを置換して指定したときに成功する() throws Exception {
+		List<Person> list = personDao.list();
+		Assert.assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
+
+		Person person = new Person(6L, null);
+		personDao.add(person);
+
+		assertThat(dataSource).dataSetOf("/META-INF/dbtest/replaced_expected.xml", Collections.singletonMap("{replacement}", null));
+	}
+
+	@DataSet("/META-INF/dbtest/data.xml")
+	@Test
+	public void dataSourceで異なる予測データセットを置換して指定したときに失敗する() throws Exception {
+		List<Person> list = personDao.list();
+		Assert.assertThat(new BigDecimal(list.size()), comparesEqualTo(new BigDecimal(5L)));
+
+		Person person = new Person(6L, "{replacement}");
+		personDao.add(person);
+
+		try {
+			assertThat(dataSource).dataSetOf("/META-INF/dbtest/failed_expected.xml", Collections.singletonMap("{replacement}", "{replaced}"));
 			throw new Exception();
 		} catch (AssertionError e){
 			//ok

@@ -54,6 +54,10 @@ public class PersonDao {
 	}
 
 	public void add(Person person) throws SQLException {
-		dataSource.getConnection().createStatement().execute("INSERT INTO person (id, name) VALUES (" + person.getId() + ", '" + person.getName() + "')");
+		if (person.getName() != null) {
+			dataSource.getConnection().createStatement().execute("INSERT INTO person (id, name) VALUES (" + person.getId() + ", '" + person.getName() + "')");
+		} else {
+			dataSource.getConnection().createStatement().execute("INSERT INTO person (id) VALUES (" + person.getId() + ")");
+		}
 	}
 }

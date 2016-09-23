@@ -18,7 +18,7 @@ pom.xml
 <dependency>
 	<groupId>com.duck8823.springboot</groupId>
 	<artifactId>springboot-test-dbunit</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.5</version>
 	<scope>test</scope>
 </dependency>
 ```
@@ -73,6 +73,15 @@ import static com.duck8823.matcher.DataSetAssertions.assertThat;
 @Test
 public void test() {
     assertThat(dataSource).dataSetOf("expected.xml");
+}
+```
+xml内の文字列をオブジェクトに置換できる
+```java
+import static com.duck8823.matcher.DataSetAssertions.assertThat;
+...
+@Test
+public void test() {
+    assertThat(dataSource).dataSetOf("expected.xml", Collections.singletonMap("{null}", null));
 }
 ```
 
