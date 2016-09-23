@@ -23,9 +23,17 @@
  */
 package com.duck8823.matcher;
 
+import net.arnx.jsonic.JSON;
 import org.assertj.core.api.AbstractAssert;
+import org.dbunit.dataset.Column;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.springframework.boot.json.JsonParser;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * データセットと比較する.
@@ -44,9 +52,30 @@ public class DataSetAssert extends AbstractAssert<DataSetAssert, IDataSet> {
 	 */
 	public DataSetAssert dataSetOf(String name) throws DataSetException {
 		if (!IDataSetMatcher.dataSetOf(name).matches(this.actual)){
-			this.failWithMessage("内容が一致しません.\n(実際の値=\"%s\")\n（期待値=\"%s\"）", this.actual, IDataSetMatcher.dataSetOf(name));
+			this.failWithMessage("内容が一致しません.\n(実際の値=\"%s\")\n（期待値=\"%s\"）",
+					toJsonString(this.actual),
+					toJsonString(new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(name)))
+			);
 		}
 		return this;
 	}
 
+	private String toJsonString(IDataSet iDataSet) throws DataSetException {
+		Map<String, List<Map<String, Object>>> dataSet = new LinkedHashMap<>();
+		for(String tableName : iDataSet.getTableNames()) {
+			List<Map<String, Object>> table = new ArrayList<>();
+			ITable itable = iDataSet.getTable(tableName);
+			List<String> columnNames = Arrays.stream(itable.getTableMetaData().getColumns()).map(Column::getColumnName).collect(Collectors.toList());
+			for(int i = 0; i < itable.getRowCount(); i++) {
+				Map<String, Object> record = new LinkedHashMap<>();
+				for(String columnName : columnNames) {
+					Object value = itable.getValue(i, columnName);
+					record.put(columnName.toUpperCase(), value);
+				}
+				table.add(record);
+			}
+			dataSet.put(tableName.toUpperCase(), table);
+		}
+		return JSON.encode(dataSet, false);
+	}
 }
