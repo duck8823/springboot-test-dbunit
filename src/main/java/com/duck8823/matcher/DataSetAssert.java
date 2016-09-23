@@ -61,13 +61,13 @@ public class DataSetAssert extends AbstractAssert<DataSetAssert, IDataSet> {
 	}
 
 	private String toJsonString(IDataSet iDataSet) throws DataSetException {
-		Map<String, List<Map<String, Object>>> dataSet = new LinkedHashMap<>();
+		Map<String, List<Map<String, Object>>> dataSet = new TreeMap<>();
 		for(String tableName : iDataSet.getTableNames()) {
 			List<Map<String, Object>> table = new ArrayList<>();
 			ITable itable = iDataSet.getTable(tableName);
 			List<String> columnNames = Arrays.stream(itable.getTableMetaData().getColumns()).map(Column::getColumnName).collect(Collectors.toList());
 			for(int i = 0; i < itable.getRowCount(); i++) {
-				Map<String, Object> record = new LinkedHashMap<>();
+				Map<String, Object> record = new TreeMap<>();
 				for(String columnName : columnNames) {
 					Object value = itable.getValue(i, columnName);
 					record.put(columnName.toUpperCase(), value);
