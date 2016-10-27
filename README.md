@@ -16,7 +16,7 @@ pom.xml
 </repository>
 ...
 <dependency>
-	<groupId>com.duck8823.springboot</groupId>
+	<groupId>com.duck8823</groupId>
 	<artifactId>springboot-test-dbunit</artifactId>
 	<version>0.0.5</version>
 	<scope>test</scope>
