@@ -36,4 +36,5 @@ public @interface DataSet {
 
 	String value();
 
+	String replaceNull() default "{null}";
 }

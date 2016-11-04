@@ -27,6 +27,7 @@ import com.duck8823.annotation.DataSet;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 import org.springframework.test.context.TestContext;
@@ -54,7 +55,8 @@ public class DbUnitTestListener extends AbstractTestExecutionListener {
 	private void before(TestContext testContext, DataSet dataSet) throws DatabaseUnitException, SQLException {
 		if(dataSet != null){
 			DatabaseConnection connection = new DatabaseConnection(testContext.getApplicationContext().getBean(DataSource.class).getConnection());
-			IDataSet iDataSet = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(dataSet.value()));
+			ReplacementDataSet iDataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(dataSet.value())));
+			iDataSet.addReplacementObject(dataSet.replaceNull(), null);
 			DatabaseOperation.CLEAN_INSERT.execute(connection, iDataSet);
 		}
 	}
