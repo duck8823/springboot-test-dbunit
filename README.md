@@ -18,7 +18,7 @@ pom.xml
 <dependency>
 	<groupId>com.duck8823</groupId>
 	<artifactId>springboot-test-dbunit</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<scope>test</scope>
 </dependency>
 ```
@@ -35,6 +35,16 @@ data.xml
 	<Person id="5" name="test_5" />
 </dataset>
 ```
+  
+NULLのインサート
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+	<Person id="1" name="test_1" />
+	<Person id="2" name="{null}" />
+</dataset>
+```
+デフォルトでは `{null}` を置換する.  
   
   
 ### アノテーション  
