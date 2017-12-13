@@ -1,4 +1,5 @@
 # springboot-test-dbunit
+[![](https://jitpack.io/v/duck8823/springboot-test-dbunit.svg)](https://jitpack.io/#duck8823/springboot-test-dbunit)
 [![Build Status](https://travis-ci.org/duck8823/springboot-test-dbunit.svg?branch=master)](https://travis-ci.org/duck8823/springboot-test-dbunit)
 [![Coverage Status](http://coveralls.io/repos/github/duck8823/springboot-test-dbunit/badge.svg?branch=master)](https://coveralls.io/github/duck8823/springboot-test-dbunit?branch=master)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)  
@@ -9,16 +10,17 @@ springbootでDbUnitのデータセットを使う.
 ### Maven
 pom.xml
 ```xml
-<repository>
-	<id>duck8823.com</id>
-	<name>duck8823.com</name>
-	<url>http://www.duck8823.com/maven</url>
-</repository>
+<repositories>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
+</repositories>
 ...
 <dependency>
-	<groupId>com.duck8823</groupId>
+	<groupId>com.github.duck8823</groupId>
 	<artifactId>springboot-test-dbunit</artifactId>
-	<version>0.0.6</version>
+	<version>0.0.7</version>
 	<scope>test</scope>
 </dependency>
 ```
@@ -78,7 +80,7 @@ public void test() {
 #### AssertJスタイル
 パスを指定
 ```java
-import static com.duck8823.matcher.DataSetAssertions.assertThat;
+import static com.github.duck8823.matcher.DataSetAssertions.assertThat;
 ...
 @Test
 public void test() {
@@ -87,7 +89,7 @@ public void test() {
 ```
 xml内の文字列をオブジェクトに置換できる
 ```java
-import static com.duck8823.matcher.DataSetAssertions.assertThat;
+import static com.github.duck8823.matcher.DataSetAssertions.assertThat;
 ...
 @Test
 public void test() {
@@ -98,7 +100,7 @@ public void test() {
 #### IDataSetMatcher
 パスを指定
 ```java
-import static com.duck8823.mathcer.IDataSetMatcher.dataSetOf;
+import static com.github.duck8823.mathcer.IDataSetMatcher.dataSetOf;
 import static org.junit.Assert.assertThat;
 ...
 @Test
@@ -110,7 +112,7 @@ public void test() {
   
 IDataSetを指定
 ```java
-import static com.duck8823.mathcer.IDataSetMatcher.dataSetOf;
+import static com.github.duck8823.mathcer.IDataSetMatcher.dataSetOf;
 import static org.junit.Assert.assertThat;
 ...
 @Test
@@ -124,7 +126,7 @@ public void test() {
 #### ITableMatcher
 ITableを指定
 ```java
-import static com.duck8823.mathcer.ITableMatcher.tableOf;
+import static com.github.duck8823.mathcer.ITableMatcher.tableOf;
 import static org.junit.Assert.assertThat;
 ...
 @Test
