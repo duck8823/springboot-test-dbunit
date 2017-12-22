@@ -23,19 +23,6 @@
 		<java.version>1.8</java.version>
 	</properties>
 
-	<profiles>
-		<profile>
-			<id>local</id>
-			<distributionManagement>
-				<repository>
-					<id>local</id>
-					<name>local</name>
-					<url>file://localhost/var/mvn/repo</url>
-				</repository>
-			</distributionManagement>
-		</profile>
-	</profiles>
-
 	<build>
 		<plugins>
 			<plugin>
